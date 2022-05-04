@@ -33,16 +33,16 @@ io.on("connection",socket=>{
         addToRoom({userName,roomId,socketId})
         socket.join(roomId)
         socket.to(roomId).emit("joinMessage",`${userName} join the room`);
-        
-        
-        
-        
-    })
-    socket.on("peer",({roomId,peer})=>{
-
         socket.to(roomId).emit("peer",peer)
         
+        
+        
+        
     })
+    // socket.on("peer",({roomId,peer})=>{
+
+        
+    // })
     
 
 
