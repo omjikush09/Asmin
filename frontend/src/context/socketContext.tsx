@@ -1,17 +1,21 @@
 import {createContext,useState,useEffect} from "react";
 import Peer from "simple-peer"
 import { io } from "socket.io-client";
-import { nanoid } from "nanoid";
+
+
+
+type users={userName:string,socketId:string,stream:MediaStream}[]
 
 interface context{
     stream:MediaStream |undefined,
     myName:string,
-    users:{userName:string,stream:MediaStream}[],
+    users:{userName:string,socketId:string,stream:MediaStream}[],
     myId:string,
     setMyId:React.Dispatch<React.SetStateAction<string>>,
     setMyName:React.Dispatch<React.SetStateAction<string>>,
-    roomId:string,
-    setRoomId:React.Dispatch<React.SetStateAction<string>>
+    roomId:string |undefined,
+    setRoomId:React.Dispatch<React.SetStateAction<string>>,
+    addToRoom:(id:string)=>void
 }
 
 
@@ -24,7 +28,7 @@ const Context=({children}:{children:JSX.Element})=>{
     const [myId, setMyId] = useState<string>("");
     const [stream,setStream]=useState<MediaStream |undefined>(undefined)
     const [myName,setMyName]=useState<string>("")
-    const [users,setUsers]=useState<{userName:string,stream:MediaStream}[]>([])
+    const [users,setUsers]=useState<users>([])
     // const [join,setJoin]
     const [roomId,setRoomId]=useState<string>("");
 
@@ -38,7 +42,9 @@ const Context=({children}:{children:JSX.Element})=>{
         
         }).then((stream)=>{
             setStream(stream)
-            setUsers([...users,{userName:myName,stream}])
+            socket.on("me",data=>{
+                setUsers([...users,{userName:myName,stream,socketId:data}])
+            })
         })
         socket.on("addUser",({socketId,signalData,userName}:{socketId:string,signalData:any,userName:string})=>{
             const peer = new Peer({initiator:false,stream})
@@ -47,7 +53,7 @@ const Context=({children}:{children:JSX.Element})=>{
             })
             peer.on("stream",(currentStream)=>{
                 console.log("I have stream")
-                setUsers([...users,{userName,stream:currentStream}])
+                setUsers([...users,{userName,stream:currentStream,socketId}])
 
             })
             peer.signal(signalData)
@@ -108,7 +114,8 @@ const Context=({children}:{children:JSX.Element})=>{
         setMyId,
         setMyName,
         roomId,
-        setRoomId
+        setRoomId,
+        addToRoom
 
      }}>
 
@@ -118,4 +125,4 @@ const Context=({children}:{children:JSX.Element})=>{
     )
 }
 
-export default {Context,SocketContext}
+export  {Context,SocketContext}

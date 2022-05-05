@@ -2,7 +2,7 @@ import express from "express"
 const app= express();
 import http from "http"
 import {Server} from "socket.io"
-import { addToRoom } from "./controllers/main";
+
 
 
 //routes
@@ -26,10 +26,28 @@ export const io=new Server(server,{
 })
 
 
+interface user{
+    userName:string,
+    roomId:string,
+    socketId:string
+}
+
+var users:user[]=[];
+
+ const addToRoom=({userName,roomId,socketId}:user):user[]=>{
+        const user={userName,roomId,socketId}
+        console.log(users)
+        users.push(user);
+        return users
+}
  
 io.on("connection",socket=>{
 
+    socket.emit("me",socket.id
+    )
+
     socket.on("addToRoom",({userName,roomId,socketId=socket.id,signalData}:room)=>{
+        console.log(userName,roomId,socketId)
         addToRoom({userName,roomId,socketId})
         socket.join(roomId)
         io.to(roomId).emit("addUser",{socketId,signalData,userName})
