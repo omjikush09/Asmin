@@ -8,11 +8,8 @@ const user = ({users}:{users:{userName:string,socketId:string}[]}) => {
     <div>
         {users && users.map((user,index)=>{
             return (
-                <Avatar sx={{bgcolor:"blue"}}  >
-                    {user.userName[0]}
-                    
-                </Avatar>
-
+              <div>{user.userName}</div>
+              
                
             )
         })}

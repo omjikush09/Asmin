@@ -6,7 +6,7 @@ import { addToRoom } from "./controllers/main";
 
 
 //routes
-import room from "./route"
+// import room from "./route"
 
 
 const server=http.createServer(app);
@@ -15,7 +15,7 @@ interface room{
     userName:string,
     roomId:string,
     socketId:string,
-    peer:any
+   signalData:any
 }
 
 
@@ -29,16 +29,22 @@ export const io=new Server(server,{
  
 io.on("connection",socket=>{
 
-    socket.on("join-room",({userName,roomId,socketId=socket.id,peer}:room)=>{
+    socket.on("addToRoom",({userName,roomId,socketId=socket.id,signalData}:room)=>{
         addToRoom({userName,roomId,socketId})
         socket.join(roomId)
-        socket.to(roomId).emit("joinMessage",`${userName} join the room`);
-        socket.to(roomId).emit("peer",peer)
-        
-        
+        io.to(roomId).emit("addUser",{socketId,signalData,userName})
+        // socket.on("answerCall",(data)=>{
+        //     socket.emit("callAccepted",(data))
+        // })
+        io.to(roomId).emit("joinMessage",`${userName} join the room`);
         
         
     })
+
+    socket.on("sendSignalToOriginal",({data,socketId})=>{
+            io.to(socketId).emit("added",data)
+    })
+    
     // socket.on("peer",({roomId,peer})=>{
 
         
@@ -51,7 +57,7 @@ io.on("connection",socket=>{
 })
 
 
-app.use(room)
+// app.use(room)
 
 
 
