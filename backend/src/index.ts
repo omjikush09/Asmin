@@ -42,10 +42,11 @@ var users:user[]=[];
 }
  
 io.on("connection",socket=>{
-
-    socket.emit("me",socket.id
-    )
-
+    console.log(socket.id ,"is connected")
+    socket.on("sendId",()=>{
+        socket.emit("me",socket.id)
+    })
+    
     socket.on("addToRoom",({userName,roomId,socketId=socket.id,signalData}:room)=>{
         console.log(userName,roomId,socketId)
         addToRoom({userName,roomId,socketId})

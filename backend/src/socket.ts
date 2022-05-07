@@ -1,13 +1,13 @@
-import { io } from "."
+// import { io } from "."
 
 
-io.on("connection",(socket)=>{
+// io.on("connection",(socket)=>{
     
-    socket.emit("myid",socket.id);
-    socket.on("join-room",({...data})=>{
-        socket.join(data.roomId)
-    })
-})
+//     socket.emit("myid",socket.id);
+//     socket.on("join-room",({...data})=>{
+//         socket.join(data.roomId)
+//     })
+// })
 
 
 

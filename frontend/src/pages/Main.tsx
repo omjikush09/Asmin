@@ -21,7 +21,7 @@ const Main = () => {
 
   return (
 
-    <User users={users} />
+    <User  />
     // <h1>dd</h1>
 
 

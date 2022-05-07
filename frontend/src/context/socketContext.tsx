@@ -1,4 +1,4 @@
-import {createContext,useState,useEffect} from "react";
+import {createContext,useState,useEffect, useRef} from "react";
 import Peer from "simple-peer"
 import { io } from "socket.io-client";
 
@@ -15,7 +15,8 @@ interface context{
     setMyName:React.Dispatch<React.SetStateAction<string>>,
     roomId:string |undefined,
     setRoomId:React.Dispatch<React.SetStateAction<string>>,
-    addToRoom:(id:string)=>void
+    addToRoom:(id:string)=>void,
+    mainDiv:React.RefObject<HTMLDivElement>
 }
 
 
@@ -32,7 +33,7 @@ const Context=({children}:{children:JSX.Element})=>{
     // const [join,setJoin]
     const [roomId,setRoomId]=useState<string>("");
 
-
+    const mainDiv=useRef<HTMLDivElement>(null)
 
 
     useEffect(() => {
@@ -40,21 +41,25 @@ const Context=({children}:{children:JSX.Element})=>{
         navigator.mediaDevices.getUserMedia({
             audio:true,
         
-        }).then((stream)=>{
-            setStream(stream)
+        }).then((currentstream)=>{
+            setStream(currentstream)
+            console.log("stream in coming")
+            socket.emit("sendId","id")
             socket.on("me",data=>{
-                setUsers([...users,{userName:myName,stream,socketId:data}])
+                console.log("me")
+                setUsers([...users,{userName:myName,stream:currentstream,socketId:data}])
             })
         })
         socket.on("addUser",({socketId,signalData,userName}:{socketId:string,signalData:any,userName:string})=>{
             const peer = new Peer({initiator:false,stream})
+            console.log("happy birthday")
             peer.on("signal",(data)=>{
                 socket.emit("sendSignalToOriginal",{data,socketId})
             })
             peer.on("stream",(currentStream)=>{
                 console.log("I have stream")
                 setUsers([...users,{userName,stream:currentStream,socketId}])
-
+                    
             })
             peer.signal(signalData)
            
@@ -115,7 +120,8 @@ const Context=({children}:{children:JSX.Element})=>{
         setMyName,
         roomId,
         setRoomId,
-        addToRoom
+        addToRoom,
+        mainDiv
 
      }}>
 

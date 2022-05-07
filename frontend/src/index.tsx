@@ -19,7 +19,7 @@ root.render(
   <Route path='/' element={<Home/>} />
  
 
-<Route path='room/:roomId' element={ <Context><Main/></Context>} />
+  <Route path='room/:roomId' element={ <Context><Main/></Context>} />
 
 
 
