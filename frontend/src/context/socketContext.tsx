@@ -3,9 +3,13 @@ import Peer from "simple-peer"
 import { io } from "socket.io-client";
 
 
-
 type users={userName:string,socketId:string,stream:MediaStream}[]
 
+interface user{
+    userName:string,
+    roomId:string,
+    socketId:string
+}
 interface context{
     stream:MediaStream |undefined,
     myName:string,
@@ -37,10 +41,10 @@ const Context=({children}:{children:JSX.Element})=>{
 
 
     useEffect(() => {
-        
+        console.log("useEffecte")
         navigator.mediaDevices.getUserMedia({
             audio:true,
-        
+         
         }).then((currentstream)=>{
             setStream(currentstream)
             console.log("stream in coming")
@@ -51,10 +55,10 @@ const Context=({children}:{children:JSX.Element})=>{
             })
         })
         socket.on("addUser",({socketId,signalData,userName}:{socketId:string,signalData:any,userName:string})=>{
-            const peer = new Peer({initiator:false,stream})
+            const peer = new Peer({initiator:false,trickle:false,stream})
             console.log("happy birthday")
             peer.on("signal",(data)=>{
-                socket.emit("sendSignalToOriginal",{data,socketId})
+                socket.emit("sendSignalToOriginal",{data,socketId,userName})
             })
             peer.on("stream",(currentStream)=>{
                 console.log("I have stream")
@@ -84,21 +88,43 @@ const Context=({children}:{children:JSX.Element})=>{
 
 
     const addToRoom=(roomId:string)=>{
-        const peer=new Peer({initiator:true,trickle:false,stream:stream})
-        peer.on('signal',(data)=>{
-                socket.emit("addToRoom",{
-                    roomId,
-                    signalData:data,
-                   userName:myName
-                })
-            })
 
-        peer.on("stream",(currentStream)=>{
-            console.log("I have stream")
-        }) 
-        socket.on("added",(data)=>{
-            peer.signal(data)
+        socket.emit("getUserInRoom",roomId);
+        socket.emit("addToRoom",{roomId,userName:"temp"})
+        socket.on("userInRoom",(users)=>{
+            console.log("userInRoom working",users)
+            console.log("socket it while addtomRoom ", socket.id)
+                users && users.forEach((user:user)=>{
+                    if(user.socketId!==socket.id){
+                       
+                    
+                    const peer=new Peer({initiator:true,trickle:false,stream:stream})
+                    peer.on('signal',(data)=>{
+                            socket.emit("sendSignal",{
+                                roomId,
+                                signalData:data,
+                               userName:myName,
+                               socketId:user.socketId
+                            }) 
+                        })
+                        
+                    socket.on("added",({data,socketId,userName})=>{
+                        if(socketId===user.socketId){
+
+                            peer.on("stream",(currentStream)=>{
+                                console.log("end")
+                                setUsers([...users,{userName,stream:currentStream,socketId}])
+                            }) 
+                            
+                            peer.signal(data)
+                            console.log("add data to signal")
+                        }
+                    })
+
+                }
+                })
         })
+       
 
         
         

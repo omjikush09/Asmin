@@ -22,7 +22,7 @@ const User = () => {
           console.log(divref.current["children"][index]["children"][0])
           // @ts-ignore: 
           let refsrc=divref.current["children"][index]["children"][0]["srcObject"]=user.stream
-          console.log("hello stream is working")
+         
           // refsrc
           console.log(refsrc)
         }

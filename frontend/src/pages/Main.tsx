@@ -11,6 +11,7 @@ const Main = () => {
     const param=useParams();
    
     useEffect(()=>{
+        console.log("useEffect imain")
         if(typeof param.roomId ==="string"){
           console.log(param.roomId)
             setRoomId(param.roomId)
