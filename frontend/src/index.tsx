@@ -5,8 +5,9 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { Route, BrowserRouter , Routes  } from 'react-router-dom';
 import Home from './pages/Home';
-import { Context } from './context/SocketContext';
-import Main from './pages/Main';
+// import { Context } from './context/SocketContext';
+// import Main from './pages/Main';
+import User from "./components/User"
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -19,7 +20,7 @@ root.render(
   <Route path='/' element={<Home/>} />
  
 
-  <Route path='room/:roomId' element={ <Context><Main/></Context>} />
+  <Route path='room/:roomId' element={ <User/>} />
 
 
 
